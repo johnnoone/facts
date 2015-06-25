@@ -1,4 +1,5 @@
 import asyncio
+import logging
 import os.path
 from pkgutil import extend_path, walk_packages
 from facts.conf import settings
@@ -35,7 +36,7 @@ def load(force=False):
         __path__.append(userpath)
 
     def notify_error(name):
-        print('unable to load %s package' % name)
+        logging.error('unable to load %s package' % name)
 
     walker = walk_packages(__path__, '%s.' % __name__, onerror=notify_error)
     for module_finder, name, ispkg in walker:

@@ -1,4 +1,5 @@
 import asyncio
+from .targeting import Target
 from collections import OrderedDict
 from facts import grafts
 
@@ -22,6 +23,16 @@ class Logical:
     def as_dict(self):
         data = yield from self.items()
         return OrderedDict(data)
+
+    @asyncio.coroutine
+    def read(self, target):
+        data = yield from self.as_dict()
+        return Target(target).read(data)
+
+    @asyncio.coroutine
+    def match(self, target):
+        data = yield from self.as_dict()
+        return Target(target).match(data)
 
 
 class Accumulator:

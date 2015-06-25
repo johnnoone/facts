@@ -21,20 +21,57 @@ Get all facts::
 
 Get one fact::
 
-    fact read foo:bar
+    fact read foo
 
 Set one custom fact::
 
-    fact write foo:baz 'It is nice'
+    fact write foo 'It is nice'
 
 When value is a mapping, then you can choose between 2 merging strategies::
 
-    fact write foo:baz '{is: baz}' --format yaml --replace
-    fact write foo:baz '{is: baz}' --format yaml --merge
+    fact write foo '{is: bar}' --format yaml --replace
+    fact write foo '{not: baz}' --format yaml --merge
 
 Delete a custom fact::
 
-    fact delete foo:bar
+    fact delete foo
+
+
+Targeting
+---------
+
+By convention key facts can't have colon marks.
+Because facts can be nested, and it's possible to target these sub data.
+Each parts must be seperated by a colon. For example if::
+
+    fact read foo
+
+returns::
+
+    is: bar
+    not: baz
+
+Then::
+
+    fact read foo:is
+
+returns::
+
+    bar
+
+But::
+
+    fact read foo:wrong:key
+
+will return nothing.
+
+
+Matching
+--------
+
+It is also possible to check if a certain fact turns out true::
+
+    fact match foo:is:bar
 
 
 Extending

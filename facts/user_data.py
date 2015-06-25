@@ -1,3 +1,5 @@
+import os
+import os.path
 from .serializer import dump, load
 from .targeting import Target
 
@@ -22,10 +24,13 @@ class UserFacts:
 
     def write(self, target, value, merge=False):
         data = Target(target).write(self.data, value, merge)
-        with open(self.filename, 'w') as file:
-            file.write(dump(data))
+        self._write(data)
 
     def delete(self, target):
         data = Target(target).delete(self.data)
+        self._write(data)
+
+    def _write(self, data):
+        os.makedirs(os.path.dirname(self.filename), exist_ok=True)
         with open(self.filename, 'w') as file:
             file.write(dump(data))

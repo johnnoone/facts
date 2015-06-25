@@ -1,7 +1,7 @@
 import argparse
 from . import Logical, UserFacts
 from .serializer import dump, load
-from .targeting import NotFound, Target
+from .targeting import NotFound
 from aioutils import Group
 from facts.conf import settings
 
@@ -62,29 +62,29 @@ def all_handler(parser, args):
 def read_handler(parser, args):
     g = Group()
     logical = Logical()
-    task = g.spawn(logical.as_dict())
+    task = g.spawn(logical.read(args.target))
     g.join()
-    data = task.result()
-    target = Target(args.target)
     try:
-        frag = target.read(data)
+        resp = task.result()
+        code = 0
     except NotFound:
-        frag = None
-    print(dump(frag, explicit_start=True, default_flow_style=False))
+        resp = None
+        code = 1
+    msg = dump(resp, explicit_start=True, default_flow_style=False)
+    parser.exit(code, msg)
 
 
 def match_handler(parser, args):
     g = Group()
     logical = Logical()
-    task = g.spawn(logical.as_dict())
+    task = g.spawn(logical.match(args.target))
     g.join()
-    data = task.result()
-    target = Target(args.target)
     try:
-        resp = target.match(data)
+        resp = task.result()
     except NotFound:
         resp = None
-    print(dump(resp, explicit_start=True, default_flow_style=False))
+    msg = dump(resp, explicit_start=True, default_flow_style=False)
+    parser.exit(0, msg)
 
 
 def write_handler(parser, args):
@@ -97,7 +97,6 @@ def write_handler(parser, args):
 def delete_handler(parser, args):
     user_facts = UserFacts(settings.userfacts)
     user_facts.delete(args.target)
-    raise NotImplementedError()
 
 
 def resolve(*tasks):
