@@ -7,7 +7,7 @@ with open('README.rst') as file:
 
 setup(
     name='facts',
-    version='0.2',
+    version='0.3',
     description='Return facts of server',
     long_description=content,
     author='Xavier Barbosa',

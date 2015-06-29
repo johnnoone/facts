@@ -4,4 +4,4 @@ from .targeting import Target
 from .user_data import UserFacts
 
 __all__ = ['graft', 'Graft', 'Logical', 'Namespace', 'Target', 'UserFacts']
-__version__ = '0.2'
+__version__ = '0.3'
