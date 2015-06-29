@@ -38,6 +38,9 @@ setup(
     entry_points={
         'console_scripts': [
             'facts = facts.__main__:run'
+        ],
+        'facts.graft': [
+            'ruby-facts = facts.contribs:facter_info'
         ]
     }
 )

@@ -74,8 +74,14 @@ It is also possible to check if a certain fact turns out true::
     fact match foo:is:bar
 
 
-Extending
----------
+Grafting
+--------
+
+Facts allow you to extends with 'grafts'. There is 2 ways
+
+
+1. by modules
+~~~~~~~~~~~~~
 
 You can extend with your own facts. Any python modules under ``~/.facts/grafts``
 will be loaded. For example::
@@ -91,3 +97,16 @@ will be loaded. For example::
         }
 
 Will append the fact ``hello`` with the value ``world``.
+
+
+2. with setuptools
+~~~~~~~~~~~~~~~~~~
+
+You also write python libraries that will contribute to facts with using setuptools. Add the following to the setup.py function::
+
+    entry_points={
+        'facts.graft': [
+            'plugin-1 = mylib:plugin_1',
+            'plugin-2 = mylib:plugin_2'
+        ]
+    }

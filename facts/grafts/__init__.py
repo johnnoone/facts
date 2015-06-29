@@ -1,8 +1,9 @@
 import asyncio
 import logging
 import os.path
-from pkgutil import extend_path, walk_packages
 from facts.conf import settings
+from pkgutil import extend_path, walk_packages
+from pkg_resources import iter_entry_points
 
 __path__ = extend_path(__path__, __name__)
 __all__ = ['graft']
@@ -15,8 +16,13 @@ def graft(func):
     """
     func = asyncio.coroutine(func)
     setattr(func, '_is_graft', True)
-    GRAFTS.append(func)
     return func
+
+
+def is_graft(func):
+    """Tells if func is a fragt.
+    """
+    return getattr(func, '_is_graft', False)
 
 
 def load(force=False):
@@ -38,9 +44,25 @@ def load(force=False):
     def notify_error(name):
         logging.error('unable to load %s package' % name)
 
+    # autoload decorated functions
     walker = walk_packages(__path__, '%s.' % __name__, onerror=notify_error)
     for module_finder, name, ispkg in walker:
         loader = module_finder.find_module(name)
-        loader.load_module(name)
+        mod = loader.load_module(name)
+        for func in mod.__dict__.values():
+            if is_graft(func):
+                GRAFTS.append(func)
+
+    # append setuptools modules
+    for entry_point in iter_entry_points(group=settings.entry_point):
+        try:
+            func = entry_point.load()
+            if is_graft(func):
+                GRAFTS.append(func)
+            else:
+                notify_error(entry_point.name)
+        except Exception as error:
+            logging.exception(error)
+            notify_error(entry_point.name)
 
     return GRAFTS

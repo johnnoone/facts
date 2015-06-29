@@ -14,7 +14,7 @@ except ImportError:
 
 
 @graft
-def cpu_data():
+def cpu_info():
     """Returns cpu data.
     """
     return {
@@ -23,7 +23,7 @@ def cpu_data():
 
 
 @graft
-def os_data():
+def os_info():
     """Returns os data.
     """
     return {
@@ -34,7 +34,7 @@ def os_data():
 
 
 @graft
-def python():
+def python_info():
     """Returns Python data.
     """
     return {
@@ -45,7 +45,7 @@ def python():
 
 
 @graft
-def facts():
+def facts_info():
     """Returns facts library data.
     """
     from facts import __version__
@@ -57,7 +57,7 @@ def facts():
 
 
 @graft
-def network():
+def network_info():
     """Returns hostname, ipv4 and ipv6.
     """
 
@@ -74,7 +74,7 @@ def network():
 
 
 @graft
-def mac_addr():
+def mac_addr_info():
     """Returns mac address.
     """
     mac = get_mac()
@@ -98,7 +98,7 @@ def locale_info():
 
 
 @graft
-def interfaces():
+def interfaces_info():
     """Returns interfaces data.
     """
     def humanize(value):
@@ -121,7 +121,7 @@ def interfaces():
 
 
 @graft
-def gateways():
+def gateways_info():
     """Returns gateways data.
     """
     data = netifaces.gateways()
