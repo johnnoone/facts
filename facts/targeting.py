@@ -14,7 +14,10 @@ class WrongType(ValueError):
 class Target(str):
 
     def __init__(self, target):
-        self.parts = target.split(':')
+        if target is None:
+            self.parts = []
+        else:
+            self.parts = target.split(':')
 
     def __iter__(self):
         for part in self.parts:

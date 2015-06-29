@@ -1,7 +1,8 @@
 import asyncio
+import logging
 from .targeting import Target
 from collections import OrderedDict
-from facts import grafts
+from .grafts import load as load_grafts, Namespace
 
 __all__ = ['Logical']
 
@@ -14,7 +15,7 @@ class Logical:
         """
 
         accumulator = Accumulator()
-        for graft in grafts.load():
+        for graft in load_grafts():
             accumulator.spawn(graft())
         response = yield from accumulator.join()
         return response.items()
@@ -58,8 +59,18 @@ class Accumulator:
     def _done(self, future):
         try:
             response = future.result()
+            data = self.data
+            if isinstance(response, Namespace):
+                namespace, response = response
+                logging.info('Namespace %s', namespace)
+                for part in Target(namespace):
+                    data.setdefault(part, {})
+                    data = data[part]
+
+            # TODO allow nested namespace
+
             if response is not None:
-                self.data.update(response)
+                data.update(response)
         finally:
             self.pending_tasks -= 1
             if self.ready:

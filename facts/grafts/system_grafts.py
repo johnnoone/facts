@@ -33,14 +33,14 @@ def os_info():
     }
 
 
-@graft
+@graft(namespace='python')
 def python_info():
     """Returns Python data.
     """
     return {
-        'python_version': '%s.%s.%s-%s%s' % sys.version_info,
-        'python_executable': sys.executable,
-        'python_path': sys.path
+        'version': '%s.%s.%s-%s%s' % sys.version_info,
+        'executable': sys.executable,
+        'path': sys.path
     }
 
 
@@ -86,18 +86,18 @@ def mac_addr_info():
     return {'mac': value}
 
 
-@graft
+@graft(namespace='locale')
 def locale_info():
     """Returns locale data.
     """
     code, encoding = locale.getdefaultlocale()
     return {
-        'default_language': code,
-        'default_encoding': encoding
+        'language': code,
+        'encoding': encoding
     }
 
 
-@graft
+@graft(namespace='interfaces')
 def interfaces_info():
     """Returns interfaces data.
     """
@@ -115,12 +115,10 @@ def interfaces_info():
         addrs = netifaces.ifaddresses(iface)
         results[iface] = {humanize(k): v for k, v in addrs.items()}
 
-    return {
-        'interfaces': results
-    }
+    return results
 
 
-@graft
+@graft(namespace='gateways')
 def gateways_info():
     """Returns gateways data.
     """
@@ -134,6 +132,4 @@ def gateways_info():
         results['ipv6'] = data[netifaces.AF_INET6]
         results['default']['ipv6'] = data['default'][netifaces.AF_INET6]
 
-    return {
-        'gateways': results
-    }
+    return results
