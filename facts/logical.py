@@ -57,7 +57,9 @@ class Accumulator:
 
     def _done(self, future):
         try:
-            self.data.update(future.result())
+            response = future.result()
+            if response is not None:
+                self.data.update(response)
         finally:
             self.pending_tasks -= 1
             if self.ready:
