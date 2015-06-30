@@ -1,24 +1,24 @@
 from . import graft
 from contextlib import suppress
+from facts import mark
 from uuid import getnode as get_mac
 import locale
 import netifaces
 import os
 import platform
+import psutil
 import socket
 import sys
-try:
-    from os import cpu_count
-except ImportError:
-    from multiprocessing import cpu_count
+import uptime
 
 
-@graft
+@graft(namespace='cpu')
 def cpu_info():
     """Returns cpu data.
     """
     return {
-        'cpu_count': cpu_count()
+        'count': psutil.cpu_count(logical=False),
+        'logical': psutil.cpu_count()
     }
 
 
@@ -101,7 +101,7 @@ def locale_info():
 def interfaces_info():
     """Returns interfaces data.
     """
-    def humanize(value):
+    def replace(value):
         if value == netifaces.AF_LINK:
             return 'link'
         if value == netifaces.AF_INET:
@@ -113,7 +113,7 @@ def interfaces_info():
     results = {}
     for iface in netifaces.interfaces():
         addrs = netifaces.ifaddresses(iface)
-        results[iface] = {humanize(k): v for k, v in addrs.items()}
+        results[iface] = {replace(k): v for k, v in addrs.items()}
 
     return results
 
@@ -133,3 +133,58 @@ def gateways_info():
         results['default']['ipv6'] = data['default'][netifaces.AF_INET6]
 
     return results
+
+
+@graft(namespace='uptime')
+def uptime_data():
+    """Returns uptime data.
+    """
+    return {
+        'uptime': mark(uptime.uptime(), 'duration'),
+        'boottime': uptime.boottime()
+    }
+
+
+@graft(namespace='memory')
+def memory_data():
+    """Returns memory data.
+    """
+    vm = psutil.virtual_memory()
+    sw = psutil.swap_memory()
+
+    return {
+        'virtual': {
+            'total': mark(vm.total, 'bytes'),
+            'free': mark(vm.free, 'bytes'),
+            'percent': mark(vm.percent, 'percentage')
+        },
+        'swap': {
+            'total': mark(sw.total, 'bytes'),
+            'free': mark(sw.free, 'bytes'),
+            'percent': mark(sw.percent, 'percentage')
+        },
+    }
+
+
+@graft(namespace='devices')
+def devices_data():
+    """Returns devices data.
+    """
+    response = {}
+    for part in psutil.disk_partitions():
+        device = part.device
+        response[device] = {
+            'device': device,
+            'mountpoint': part.mountpoint,
+            'fstype': part.fstype,
+            'opts': part.opts,
+        }
+        if part.mountpoint:
+            usage = psutil.disk_usage(part.mountpoint)
+            response[device]['usage'] = {
+                'size': mark(usage.total, 'bytes'),
+                'used': mark(usage.used, 'bytes'),
+                'free': mark(usage.free, 'bytes'),
+                'percent': mark(usage.percent, 'percentage')
+            }
+    return response

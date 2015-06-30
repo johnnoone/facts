@@ -30,7 +30,9 @@ setup(
     install_requires=[
         'aioutils',
         'netifaces',
-        'PyYAML'
+        'PyYAML',
+        'psutil',
+        'uptime',
     ],
     extras_require={
         ':python_version=="3.3"': ['asyncio'],

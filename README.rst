@@ -23,6 +23,10 @@ Get one fact::
 
     fact read foo
 
+Get the human readable memory usage::
+
+    fact read memory --human
+
 Set one custom fact::
 
     fact write foo 'It is nice'
@@ -83,20 +87,21 @@ Facts allow you to extends with 'grafts'. There is 2 ways
 1. by modules
 ~~~~~~~~~~~~~
 
-You can extend with your own facts. Any python modules under ``~/.facts/grafts``
-will be loaded. For example::
+You can extend with your own facts. Any python modules under ``~/.facts/grafts`` will be loaded. For example::
 
     # ~/.facts/grafts/my_grafts.py
 
-    from . import graft
+    from facts import graft, mark
 
     @graft
     def hello_world():
         return {
-            'hello': 'world'
+            'hello': 'world',
+            'size': mark(1234567890, 'bytes')
         }
 
-Will append the fact ``hello`` with the value ``world``.
+Will append the fact ``hello`` with the value ``world``, and the fact ``size``
+with one of these values (depending the --human switch) ``1234567890`` or ``1234567890K``.
 
 
 2. with setuptools

@@ -17,6 +17,10 @@ def get_parser():
 
     all_parser = cmds.add_parser('all', help='get all facts')
     all_parser.set_defaults(handle=all_handler)
+    all_parser.add_argument('--human',
+                            action='store_true',
+                            dest='humanize',
+                            help='humanize display')
 
     match_parser = cmds.add_parser('match', help='match a fact')
     match_parser.set_defaults(handle=match_handler)
@@ -25,6 +29,10 @@ def get_parser():
     read_parser = cmds.add_parser('read', help='get a fact')
     read_parser.set_defaults(handle=read_handler)
     read_parser.add_argument('target')
+    read_parser.add_argument('--human',
+                             action='store_true',
+                             dest='humanize',
+                             help='humanize display')
 
     write_parser = cmds.add_parser('write', help='set a fact')
     write_parser.set_defaults(handle=write_handler)
@@ -56,7 +64,11 @@ def all_handler(parser, args):
     logical = Logical()
     task = g.spawn(logical.as_dict())
     g.join()
-    print(dump(task.result(), explicit_start=True, default_flow_style=False))
+    msg = dump(task.result(),
+               explicit_start=True,
+               default_flow_style=False,
+               humanize=args.humanize)
+    parser.exit(0, msg)
 
 
 def read_handler(parser, args):
@@ -70,7 +82,10 @@ def read_handler(parser, args):
     except NotFound:
         resp = None
         code = 1
-    msg = dump(resp, explicit_start=True, default_flow_style=False)
+    msg = dump(resp,
+               explicit_start=True,
+               default_flow_style=False,
+               humanize=args.humanize)
     parser.exit(code, msg)
 
 
