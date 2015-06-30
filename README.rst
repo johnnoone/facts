@@ -101,7 +101,7 @@ You can extend with your own facts. Any python modules under ``~/.facts/grafts``
         }
 
 Will append the fact ``hello`` with the value ``world``, and the fact ``size``
-with one of these values (depending the --human switch) ``1234567890`` or ``1234567890K``.
+with one of these values (depending the --human switch) ``1234567890`` or ``1.1G``.
 
 
 2. with setuptools
