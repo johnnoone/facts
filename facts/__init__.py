@@ -6,4 +6,4 @@ from .user_data import UserFacts
 
 __all__ = ['graft', 'Graft', 'Logical', 'mark', 'Namespace', 'Target',
            'UserFacts']
-__version__ = '0.3'
+__version__ = '0.4'
