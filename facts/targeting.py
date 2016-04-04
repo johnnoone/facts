@@ -40,6 +40,8 @@ class Target(str):
                 frag = part in frag
             elif isinstance(frag, str):
                 frag = frag == part
+            elif isinstance(frag, int):
+                frag = frag == int(part)
             else:
                 return False
         return True if frag else False
@@ -64,6 +66,8 @@ class Target(str):
                     raise NotFound(':'.join(path)) from error
                 except ValueError as error:
                     raise WrongType(':'.join(path)) from error
+            elif isinstance(frag, (str, int)):
+                raise WrongType(':'.join(path))
             else:
                 raise NotFound(':'.join(path))
         return frag

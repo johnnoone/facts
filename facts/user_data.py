@@ -1,7 +1,6 @@
-import os
-import os.path
-from .serializer import dump, load
-from .targeting import Target
+from facts.serializer import dump, load
+from facts.targeting import Target
+from pathlib import Path
 
 __all__ = ['UserFacts']
 
@@ -9,13 +8,12 @@ __all__ = ['UserFacts']
 class UserFacts:
 
     def __init__(self, filename):
-        self.filename = filename
+        self.filename = Path(filename)
 
     @property
     def data(self):
         try:
-            with open(self.filename) as file:
-                return load(file)
+            return load(self.filename.read_text())
         except FileNotFoundError:
             return {}
 
@@ -31,6 +29,5 @@ class UserFacts:
         self._write(data)
 
     def _write(self, data):
-        os.makedirs(os.path.dirname(self.filename), exist_ok=True)
-        with open(self.filename, 'w') as file:
-            file.write(dump(data))
+        self.filename.parent.mkdir(parents=True, exist_ok=True)
+        self.filename.write_text(dump(data))

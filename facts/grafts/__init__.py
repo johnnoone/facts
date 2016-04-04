@@ -21,9 +21,8 @@ class Graft:
         self.func = asyncio.coroutine(func)
         self.namespace = namespace
 
-    @asyncio.coroutine
-    def __call__(self, *arg, **kwargs):
-        response = yield from self.func(*arg, **kwargs)
+    async def __call__(self, *arg, **kwargs):
+        response = await self.func(*arg, **kwargs)
         return Namespace(self.namespace, response)
 
 
