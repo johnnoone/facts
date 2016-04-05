@@ -1,6 +1,6 @@
 import yaml
 from collections import OrderedDict
-from .formatters import BytesType, PercType, TimeType
+from facts.formatters import BytesType, PercType, TimeType
 
 
 SafeDumper = getattr(yaml, 'CSafeDumper', yaml.SafeDumper)

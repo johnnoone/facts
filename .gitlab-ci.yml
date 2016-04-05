@@ -1,0 +1,27 @@
+---
+
+.tests_template: &tests_definition
+  script:
+    - python -m pip install -e .
+    - python -m pip install -r requirements-test.txt
+    - git submodule init && git submodule update
+    - py.test --cov facts --cov-report term-missing tests/
+  except:
+    - docs
+
+python3.5 tests:
+  <<: *tests_definition
+  tags:
+    - python3.5
+
+publish to pypi:
+  type: deploy
+  script:
+    - python -m pip install twine
+    - python setup.py sdist bdist_wheel
+    - twine upload -u $PYPI_USER -p $PYPI_PASSWORD dist/*
+  tags:
+    - python3.5
+  only:
+    - /^v[\d\.]+.*$/
+  allow_failure: true

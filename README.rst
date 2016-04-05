@@ -87,7 +87,8 @@ Facts allow you to extends with 'grafts'. There is 2 ways
 1. by modules
 ~~~~~~~~~~~~~
 
-You can extend with your own facts. Any python modules under ``~/.facts/grafts`` will be loaded. For example::
+You can extend with your own facts. Any python modules under ``~/.facts/grafts``
+will be loaded. For example::
 
     # ~/.facts/grafts/my_grafts.py
 
@@ -107,7 +108,8 @@ with one of these values (depending the --human switch) ``1234567890`` or ``1.1G
 2. with setuptools
 ~~~~~~~~~~~~~~~~~~
 
-You also write python libraries that will contribute to facts with using setuptools. Add the following to the setup.py function::
+You also write python libraries that will contribute to facts with using
+setuptools. Add the following to the setup.py function::
 
     entry_points={
         'facts.graft': [

@@ -1,38 +1,34 @@
 import asyncio
 import logging
-from .targeting import Target
 from collections import OrderedDict
-from .grafts import load as load_grafts, Namespace
+from facts.grafts import load as load_grafts, Namespace
+from facts.targeting import Target
 
 __all__ = ['Logical']
 
 
 class Logical:
 
-    @asyncio.coroutine
-    def items(self):
+    async def items(self):
         """Expose all grafts.
         """
 
         accumulator = Accumulator()
         for graft in load_grafts():
             accumulator.spawn(graft())
-        response = yield from accumulator.join()
+        response = await accumulator.join()
         return response.items()
 
-    @asyncio.coroutine
-    def as_dict(self):
-        data = yield from self.items()
+    async def as_dict(self):
+        data = await self.items()
         return OrderedDict(data)
 
-    @asyncio.coroutine
-    def read(self, target):
-        data = yield from self.as_dict()
+    async def read(self, target):
+        data = await self.as_dict()
         return Target(target).read(data)
 
-    @asyncio.coroutine
-    def match(self, target):
-        data = yield from self.as_dict()
+    async def match(self, target):
+        data = await self.as_dict()
         return Target(target).match(data)
 
 
@@ -51,7 +47,7 @@ class Accumulator:
 
     def spawn(self, coro):
         self.processing.clear()
-        task = asyncio.async(coro)
+        task = asyncio.ensure_future(coro)
         task.add_done_callback(self._done)
         self.pending_tasks += 1
         return task
@@ -76,8 +72,7 @@ class Accumulator:
             if self.ready:
                 self.processing.set()
 
-    @asyncio.coroutine
-    def join(self):
+    async def join(self):
         if not self.ready:
-            yield from self.processing.wait()
+            await self.processing.wait()
         return self.data

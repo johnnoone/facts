@@ -14,8 +14,9 @@ class WrongType(ValueError):
 class Target(str):
 
     def __init__(self, target):
-        if target is None:
-            self.parts = []
+        if not target:
+            raise ValueError('Target cannot be null')
+
         else:
             self.parts = target.split(':')
 
@@ -40,6 +41,8 @@ class Target(str):
                 frag = part in frag
             elif isinstance(frag, str):
                 frag = frag == part
+            elif isinstance(frag, int):
+                frag = frag == int(part)
             else:
                 return False
         return True if frag else False
@@ -64,6 +67,8 @@ class Target(str):
                     raise NotFound(':'.join(path)) from error
                 except ValueError as error:
                     raise WrongType(':'.join(path)) from error
+            elif isinstance(frag, (str, int)):
+                raise WrongType(':'.join(path))
             else:
                 raise NotFound(':'.join(path))
         return frag
@@ -75,6 +80,7 @@ class Target(str):
         """
         full = deepcopy(obj)
         frag = full
+
         parts, last = self.parts[:-1], self.parts[-1]
         for part in parts:
             if isinstance(frag, dict):

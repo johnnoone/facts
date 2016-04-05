@@ -3,17 +3,13 @@
 from setuptools import setup, find_packages
 import versioneer
 
-with open('README.rst') as file:
-    content = file.read()
-
 setup(
     name='facts',
     version=versioneer.get_version(),
     description='Return facts of server',
-    long_description=content,
     author='Xavier Barbosa',
     author_email='clint.northwood@gmail.com',
-    url='https://github.com/johnnoone/facts',
+    url='https://py.errorist.io/facts',
     packages=find_packages(),
     keywords=[
         'infrastructure',
@@ -25,8 +21,6 @@ setup(
         'License :: OSI Approved :: BSD License',
         'Operating System :: OS Independent',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.3',
-        'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Topic :: System :: Clustering',
     ],
@@ -46,6 +40,9 @@ setup(
         ],
         'facts.graft': [
             'ruby-facts = facts.contribs:facter_info'
+        ],
+        'jsonspec.validators.formats':[
+            'facts:path = facts.validators:validate_path'
         ]
     },
     cmdclass=versioneer.get_cmdclass()

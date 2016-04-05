@@ -59,6 +59,12 @@ def get_parser():
     return parser
 
 
+def parse_args(args=None):
+    parser = get_parser()
+    args = parser.parse_args(args)
+    return args, parser
+
+
 def all_handler(parser, args):
     g = Group()
     logical = Logical()
@@ -114,14 +120,8 @@ def delete_handler(parser, args):
     user_facts.delete(args.target)
 
 
-def resolve(*tasks):
-    """docstring for resolve"""
-    pass
-
-
 def run():
-    parser = get_parser()
-    args = parser.parse_args()
+    args, parser = parse_args()
     try:
         args.handle(parser, args)
     except Exception as error:

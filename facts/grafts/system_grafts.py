@@ -61,14 +61,17 @@ def network_info():
     """Returns hostname, ipv4 and ipv6.
     """
 
-    def extract(host, proto):
-        return socket.getaddrinfo(host, None, proto)[0][4][0]
+    def extract(host, family):
+        return socket.getaddrinfo(host, None, family)[0][4][0]
     host = socket.gethostname()
-    response = {}
-    response['hostname'] = host
-    with suppress(IndexError):
+    response = {
+        'hostname': host,
+        'ipv4': None,
+        'ipv6': None
+    }
+    with suppress(IndexError, socket.gaierror):
         response['ipv4'] = extract(host, socket.AF_INET)
-    with suppress(IndexError):
+    with suppress(IndexError, socket.gaierror):
         response['ipv6'] = extract(host, socket.AF_INET6)
     return response
 
