@@ -40,6 +40,9 @@ setup(
         ],
         'facts.graft': [
             'ruby-facts = facts.contribs:facter_info'
+        ],
+        'jsonspec.validators.formats':[
+            'facts:path = facts.validators:validate_path'
         ]
     },
     cmdclass=versioneer.get_cmdclass()

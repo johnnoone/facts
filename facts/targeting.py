@@ -14,8 +14,9 @@ class WrongType(ValueError):
 class Target(str):
 
     def __init__(self, target):
-        if target is None:
-            self.parts = []
+        if not target:
+            raise ValueError('Target cannot be null')
+
         else:
             self.parts = target.split(':')
 
@@ -79,6 +80,7 @@ class Target(str):
         """
         full = deepcopy(obj)
         frag = full
+
         parts, last = self.parts[:-1], self.parts[-1]
         for part in parts:
             if isinstance(frag, dict):
