@@ -42,7 +42,8 @@ setup(
             'ruby-facts = facts.contribs:facter_info'
         ],
         'jsonspec.validators.formats':[
-            'facts:path = facts.validators:validate_path'
+            'facts:path = facts.validators:validate_path',
+            'facts:ipv6 = facts.validators:validate_ipv6_gw'
         ]
     },
     cmdclass=versioneer.get_cmdclass()

@@ -151,7 +151,7 @@ async def test_interfaces():
                         'items': {
                             'type': 'object',
                             'properties':{
-                                'addr': {'type': 'string'},
+                                'addr': {'type': 'string', 'format': 'facts:ipv6' },
                                 'netmask': {'type': 'string'},
                             }
                         }
@@ -182,7 +182,7 @@ async def test_gateways():
                     'ipv6': {
                         'type': 'array',
                         'items': [
-                            {'type': 'string', 'format': 'ipv6'},
+                            {'type': 'string', 'format': 'facts:ipv6'},
                             {'type': 'string'},
                         ]
                     }
@@ -204,7 +204,7 @@ async def test_gateways():
                 'items': {
                     'type': 'array',
                     'items': [
-                        {'type': 'string', 'format': 'ipv6'},
+                        {'type': 'string', 'format': 'facts:ipv6'},
                         {'type': 'string'},
                         {'type': 'boolean'},
                     ]
