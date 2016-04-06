@@ -15,7 +15,7 @@ class Target(str):
 
     def __init__(self, target):
         if not target:
-            raise ValueError('Target cannot be null')
+            self.parts = []
 
         else:
             self.parts = target.split(':')

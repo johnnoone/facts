@@ -10,8 +10,6 @@ from pkg_resources import iter_entry_points
 __path__ = extend_path(__path__, __name__)
 __all__ = ['graft', 'Graft', 'Namespace']
 
-GRAFTS = []
-
 Namespace = namedtuple('Namespace', 'namespace value')
 
 
@@ -67,44 +65,54 @@ def is_graft(func):
     return isinstance(func, Graft)
 
 
-def load(force=False):
-    """Magical loading of all grafted functions.
+class Loader:
 
-    Parameters:
-        force (bool): force reload
-    """
+    def __init__(self):
+        self.GRAFTS = set([])
 
-    if GRAFTS and not force:
-        return GRAFTS
+    def run(self, force=False):
+        if self.GRAFTS and not force:
+            return self.GRAFTS
 
-    # insert missing paths
-    # this could be a configurated item
-    userpath = settings.userpath
-    if os.path.isdir(userpath) and userpath not in __path__:
-        __path__.append(userpath)
+        # insert missing paths
+        # this could be a configurated item
+        self.add_userpath(settings.userpath)
 
-    def notify_error(name):
+        # autoload decorated functions
+        self.load_decorated()
+
+        # append setuptools modules
+        self.load_setuptools(settings.entry_point)
+
+        return self.GRAFTS
+
+    def add_userpath(self, userpath):
+        if os.path.isdir(userpath) and userpath not in __path__:
+            __path__.append(userpath)
+
+    def notify_error(self, name):
         logging.error('unable to load %s package' % name)
 
-    # autoload decorated functions
-    walker = walk_packages(__path__, '%s.' % __name__, onerror=notify_error)
-    for module_finder, name, ispkg in walker:
-        loader = module_finder.find_module(name)
-        mod = loader.load_module(name)
-        for func in mod.__dict__.values():
-            if is_graft(func):
-                GRAFTS.append(func)
+    def load_decorated(self):
+        root_pkg = '%s.' % __name__
+        walker = walk_packages(__path__, root_pkg, onerror=self.notify_error)
+        for module_finder, name, ispkg in walker:
+            # if not name.endswith('_grafts'):  # TODO remove this
+            #     continue
+            loader = module_finder.find_module(name)
+            mod = loader.load_module(name)
+            for func in mod.__dict__.values():
+                if is_graft(func):
+                    self.GRAFTS.add(func)
 
-    # append setuptools modules
-    for entry_point in iter_entry_points(group=settings.entry_point):
-        try:
-            func = entry_point.load()
-            if is_graft(func):
-                GRAFTS.append(func)
-            else:
-                notify_error(entry_point.name)
-        except Exception as error:
-            logging.exception(error)
-            notify_error(entry_point.name)
-
-    return GRAFTS
+    def load_setuptools(self, group):
+        for entry_point in iter_entry_points(group=group):
+            try:
+                func = entry_point.load()
+                if is_graft(func):
+                    self.GRAFTS.add(func)
+                else:
+                    self.notify_error(entry_point.name)
+            except Exception as error:
+                logging.exception(error)
+                self.notify_error(entry_point.name)

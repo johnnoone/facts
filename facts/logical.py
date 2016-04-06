@@ -1,7 +1,7 @@
 import asyncio
 import logging
 from collections import OrderedDict
-from facts.grafts import load as load_grafts, Namespace
+from facts.grafts import Namespace, Loader
 from facts.targeting import Target
 
 __all__ = ['Logical']
@@ -14,7 +14,7 @@ class Logical:
         """
 
         accumulator = Accumulator()
-        for graft in load_grafts():
+        for graft in Loader().run():
             accumulator.spawn(graft())
         response = await accumulator.join()
         return response.items()
