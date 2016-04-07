@@ -1,12 +1,13 @@
 import pytest
 from facts.grafts import system_grafts
+from facts.grafts.helpers import as_graft
 from collections.abc import Generator
 from jsonspec.validators import load
 
 
 @pytest.mark.asyncio
 async def test_cpu():
-    data = await system_grafts.cpu_info()
+    data = await as_graft(system_grafts.cpu_info)()
     assert data.namespace == 'cpu'
     assert load({
         'type': 'object',
@@ -20,7 +21,7 @@ async def test_cpu():
 
 @pytest.mark.asyncio
 async def test_os():
-    data = await system_grafts.os_info()
+    data = await as_graft(system_grafts.os_info)()
     assert data.namespace is None
     assert load({
         'type': 'object',
@@ -53,7 +54,7 @@ async def test_os():
 
 @pytest.mark.asyncio
 async def test_python():
-    data = await system_grafts.python_info()
+    data = await as_graft(system_grafts.python_info)()
     assert data.namespace == 'python'
     assert load({
         'type': 'object',
@@ -74,7 +75,7 @@ async def test_python():
 
 @pytest.mark.asyncio
 async def test_facts():
-    data = await system_grafts.facts_info()
+    data = await as_graft(system_grafts.facts_info)()
     assert data.namespace is None
     assert load({
         'type': 'object',
@@ -94,7 +95,7 @@ async def test_facts():
 
 @pytest.mark.asyncio
 async def test_network():
-    data = await system_grafts.network_info()
+    data = await as_graft(system_grafts.network_info)()
     assert data.namespace is None
     assert load({
         'type': 'object',
@@ -109,7 +110,7 @@ async def test_network():
 
 @pytest.mark.asyncio
 async def test_mac_addr():
-    data = await system_grafts.mac_addr_info()
+    data = await as_graft(system_grafts.mac_addr_info)()
     assert data.namespace is None
     assert load({
         'type': 'object',
@@ -122,7 +123,7 @@ async def test_mac_addr():
 
 @pytest.mark.asyncio
 async def test_locale():
-    data = await system_grafts.locale_info()
+    data = await as_graft(system_grafts.locale_info)()
     assert data.namespace == 'locale'
     assert 'language' in data.value
     assert 'encoding' in data.value
@@ -138,7 +139,7 @@ async def test_locale():
 
 @pytest.mark.asyncio
 async def test_interfaces():
-    data = await system_grafts.interfaces_info()
+    data = await as_graft(system_grafts.interfaces_info)()
     assert data.namespace == 'interfaces'
     assert load({
         'type': 'object',
@@ -164,7 +165,7 @@ async def test_interfaces():
 
 @pytest.mark.asyncio
 async def test_gateways():
-    data = await system_grafts.gateways_info()
+    data = await as_graft(system_grafts.gateways_info)()
     assert data.namespace == 'gateways'
     assert load({
         'type': 'object',
@@ -173,41 +174,41 @@ async def test_gateways():
                 'type': 'object',
                 'properties': {
                     'ipv4': {
-                        'type': 'array',
-                        'items': [
-                            {'type': 'string', 'format': 'ipv4'},
-                            {'type': 'string'},
-                        ]
+                        'type': 'object',
+                        'properties': {
+                            'addr': {'type': 'string', 'format': 'ipv4'},
+                            'interface': {'type': 'string'}
+                        }
                     },
                     'ipv6': {
-                        'type': 'array',
-                        'items': [
-                            {'type': 'string', 'format': 'facts:ipv6'},
-                            {'type': 'string'},
-                        ]
+                        'type': 'object',
+                        'properties': {
+                            'addr': {'type': 'string', 'format': 'facts:ipv6'},
+                            'interface': {'type': 'string'}
+                        }
                     }
                 }
             },
             'ipv4': {
                 'type': 'array',
                 'items': {
-                    'type': 'array',
-                    'items': [
-                        {'type': 'string', 'format': 'ipv4'},
-                        {'type': 'string'},
-                        {'type': 'boolean'},
-                    ]
+                    'type': 'object',
+                    'properties': {
+                        'addr': {'type': 'string', 'format': 'ipv4'},
+                        'interface': {'type': 'string'},
+                        'default': {'type': 'boolean'}
+                    }
                 }
             },
             'ipv6': {
                 'type': 'array',
                 'items': {
-                    'type': 'array',
-                    'items': [
-                        {'type': 'string', 'format': 'facts:ipv6'},
-                        {'type': 'string'},
-                        {'type': 'boolean'},
-                    ]
+                    'type': 'object',
+                    'properties': {
+                        'addr': {'type': 'string', 'format': 'facts:ipv6'},
+                        'interface': {'type': 'string'},
+                        'default': {'type': 'boolean'}
+                    }
                 }
             }
         },
@@ -217,7 +218,7 @@ async def test_gateways():
 
 @pytest.mark.asyncio
 async def test_uptime_data():
-    data = await system_grafts.uptime_data()
+    data = await as_graft(system_grafts.uptime_data)()
     assert load({
         'type': 'object',
         'properties': {
@@ -232,7 +233,7 @@ async def test_uptime_data():
 
 @pytest.mark.asyncio
 async def test_memory():
-    data = await system_grafts.memory_data()
+    data = await as_graft(system_grafts.memory_data)()
     assert data.namespace == 'memory'
     assert load({
         'type': 'object',
@@ -262,7 +263,7 @@ async def test_memory():
 
 @pytest.mark.asyncio
 async def test_devices():
-    data = await system_grafts.devices_data()
+    data = await as_graft(system_grafts.devices_data)()
     assert data.namespace == 'devices'
     assert load({
         'type': 'object',

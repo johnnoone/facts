@@ -3,7 +3,7 @@ from facts.conf import settings
 
 
 @graft
-def user_data_info():
+async def user_data_info():
     """Returns user data.
     """
     from facts import UserFacts

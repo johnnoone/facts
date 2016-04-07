@@ -1,6 +1,6 @@
 import yaml
 from collections import OrderedDict
-from facts.formatters import BytesType, PercType, TimeType
+from facts.formatters import BytesType, MetricType, PercType, TimeType
 
 
 SafeDumper = getattr(yaml, 'CSafeDumper', yaml.SafeDumper)
@@ -11,7 +11,8 @@ class OrderedDumper(SafeDumper):
     pass
 
 OrderedDumper.add_representer(OrderedDict, OrderedDumper.represent_dict)
-OrderedDumper.add_representer(BytesType, OrderedDumper.represent_float)
+OrderedDumper.add_representer(MetricType, OrderedDumper.represent_int)
+OrderedDumper.add_representer(BytesType, OrderedDumper.represent_int)
 OrderedDumper.add_representer(PercType, OrderedDumper.represent_float)
 OrderedDumper.add_representer(TimeType, OrderedDumper.represent_float)
 

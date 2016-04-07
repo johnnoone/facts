@@ -13,7 +13,7 @@ import uptime
 
 
 @graft(namespace='cpu')
-def cpu_info():
+async def cpu_info():
     """Returns cpu data.
     """
     return {
@@ -23,7 +23,7 @@ def cpu_info():
 
 
 @graft
-def os_info():
+async def os_info():
     """Returns os data.
     """
     return {
@@ -34,7 +34,7 @@ def os_info():
 
 
 @graft(namespace='python')
-def python_info():
+async def python_info():
     """Returns Python data.
     """
     return {
@@ -45,7 +45,7 @@ def python_info():
 
 
 @graft
-def facts_info():
+async def facts_info():
     """Returns facts library data.
     """
     from facts import __version__
@@ -57,7 +57,7 @@ def facts_info():
 
 
 @graft
-def network_info():
+async def network_info():
     """Returns hostname, ipv4 and ipv6.
     """
 
@@ -77,7 +77,7 @@ def network_info():
 
 
 @graft
-def mac_addr_info():
+async def mac_addr_info():
     """Returns mac address.
     """
     mac = get_mac()
@@ -90,7 +90,7 @@ def mac_addr_info():
 
 
 @graft(namespace='locale')
-def locale_info():
+async def locale_info():
     """Returns locale data.
     """
     code, encoding = locale.getdefaultlocale()
@@ -101,7 +101,7 @@ def locale_info():
 
 
 @graft(namespace='interfaces')
-def interfaces_info():
+async def interfaces_info():
     """Returns interfaces data.
     """
     def replace(value):
@@ -122,24 +122,41 @@ def interfaces_info():
 
 
 @graft(namespace='gateways')
-def gateways_info():
+async def gateways_info():
     """Returns gateways data.
     """
     data = netifaces.gateways()
     results = {'default': {}}
 
+    def expand(data):
+        addr, interface, is_default = data
+        return {
+            'addr': addr,
+            'interface': interface,
+            'default': is_default
+        }
+
+    def expand2(data):
+        addr, interface = data
+        return {
+            'addr': addr,
+            'interface': interface
+        }
+
     with suppress(KeyError):
-        results['ipv4'] = data[netifaces.AF_INET]
-        results['default']['ipv4'] = data['default'][netifaces.AF_INET]
+        results['ipv4'] = [expand(elt) for elt in data[netifaces.AF_INET]]
+        elt = expand2(data['default'][netifaces.AF_INET])
+        results['default']['ipv4'] = elt
     with suppress(KeyError):
-        results['ipv6'] = data[netifaces.AF_INET6]
-        results['default']['ipv6'] = data['default'][netifaces.AF_INET6]
+        results['ipv6'] = [expand(elt) for elt in data[netifaces.AF_INET6]]
+        elt = expand2(data['default'][netifaces.AF_INET6])
+        results['default']['ipv6'] = elt
 
     return results
 
 
 @graft(namespace='uptime')
-def uptime_data():
+async def uptime_data():
     """Returns uptime data.
     """
     return {
@@ -149,7 +166,7 @@ def uptime_data():
 
 
 @graft(namespace='memory')
-def memory_data():
+async def memory_data():
     """Returns memory data.
     """
     vm = psutil.virtual_memory()
@@ -170,7 +187,7 @@ def memory_data():
 
 
 @graft(namespace='devices')
-def devices_data():
+async def devices_data():
     """Returns devices data.
     """
     response = {}
