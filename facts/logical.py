@@ -9,12 +9,15 @@ __all__ = ['Logical']
 
 class Logical:
 
+    def __init__(self, settings):
+        self.settings = settings
+
     async def items(self):
         """Expose all grafts.
         """
 
         accumulator = Accumulator()
-        for graft in Loader().run():
+        for graft in Loader(self.settings).run():
             accumulator.spawn(graft())
         response = await accumulator.join()
         return response.items()

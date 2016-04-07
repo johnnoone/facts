@@ -3,7 +3,6 @@ import functools
 import logging
 import os.path
 from collections import namedtuple
-from facts.conf import settings
 from pkgutil import extend_path, walk_packages
 from pkg_resources import iter_entry_points
 
@@ -67,8 +66,9 @@ def is_graft(func):
 
 class Loader:
 
-    def __init__(self):
+    def __init__(self, settings):
         self.GRAFTS = set([])
+        self.settings = settings
 
     def run(self, force=False):
         if self.GRAFTS and not force:
@@ -76,13 +76,13 @@ class Loader:
 
         # insert missing paths
         # this could be a configurated item
-        self.add_userpath(settings.userpath)
+        self.add_userpath(self.settings.userpath)
 
         # autoload decorated functions
         self.load_decorated()
 
         # append setuptools modules
-        self.load_setuptools(settings.entry_point)
+        self.load_setuptools(self.settings.entry_point)
 
         return self.GRAFTS
 
@@ -97,8 +97,6 @@ class Loader:
         root_pkg = '%s.' % __name__
         walker = walk_packages(__path__, root_pkg, onerror=self.notify_error)
         for module_finder, name, ispkg in walker:
-            # if not name.endswith('_grafts'):  # TODO remove this
-            #     continue
             loader = module_finder.find_module(name)
             mod = loader.load_module(name)
             for func in mod.__dict__.values():

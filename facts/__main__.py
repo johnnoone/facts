@@ -67,7 +67,7 @@ def parse_args(args=None):
 
 def all_handler(parser, args):
     g = Group()
-    logical = Logical()
+    logical = Logical(settings)
     task = g.spawn(logical.as_dict())
     g.join()
     msg = dump(task.result(),
@@ -79,7 +79,7 @@ def all_handler(parser, args):
 
 def read_handler(parser, args):
     g = Group()
-    logical = Logical()
+    logical = Logical(settings)
     task = g.spawn(logical.read(args.target))
     g.join()
     try:
@@ -97,7 +97,7 @@ def read_handler(parser, args):
 
 def match_handler(parser, args):
     g = Group()
-    logical = Logical()
+    logical = Logical(settings)
     task = g.spawn(logical.match(args.target))
     g.join()
     try:
